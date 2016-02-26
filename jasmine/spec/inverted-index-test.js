@@ -2,9 +2,12 @@
 
 describe("Inverted index test", function() {
 
+	beforeEach(function() {
+	});
+
 	describe("Read book data", function() {
 		it("Should read a JSON file and assert not empty", function() {
-			expect(true).toBe(true);
+			expect(Index).toBeDefined();
 		});
 	});
 
