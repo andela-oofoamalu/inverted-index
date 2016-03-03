@@ -1,60 +1,69 @@
  'use strict';
 
- // Encapsulate all the code into an object named index or inverted index
- // This object should have a createIndex function that takes the file path to books.json
- // This object can be instansiated and its instance call access its functions
-
 function Index() {
-  var bookList = [];
+  this.dataList = [];
+  this.indexObject = {};
+};
 
-  this.loadBooks = function(path, callback) {
-    var request = new XMLHttpRequest();
-    request.overrideMimeType("application/json");
-    request.open("GET", path, false);
-    request.onreadystatechange = function() {
-      if (request.readyState == 4 && request.status == "200") {
-        callback(request.responseText);
-      }
-    };
-    request.send(null);
-  };
-
-  this.getBooks = function(path) {
-    let books;
-    loadBooks(path, function(response) {
-      books = response;
-    });
-    return books;
-  };
-
-  this.parseObject = function(obj) {
-    var text = [];
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        text = text.concat(obj[key].toLowerCase().split(" "));
-      }
-    }
-    return getUniqueIndex(text);
-  };
-
-  this.getUniqueIndex = function(wordArray) {
-    var index = [];
-    for (var val of wordArray) {
-      if (index.indexOf(val) == -1 && val.length > 2) {
-        index.push(val);
-      }
-    }
-    return index;
+Index.prototype.createIndex = function(filePath) {
+  this.dataList = this.getData(filePath);
+  var count = 0;
+  for (var data of dataList) {
+    this.indexObject[count] = this.getUniqueIndex(this.parseObject(data));
+    count++;
   }
+};
 
-}
+Index.prototype.getIndex = function(filePath) {
+  this.createIndex(filePath);
+  return this.indexObject;
+};
 
+Index.prototype.search = function(arg) {
 
+};
 
+Index.prototype.parseObject = function(obj) {
+  var array = [];
+  var exceptions = /[^a-z\s]/g;
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      array = array.concat(obj[key].toLowerCase().replace(exceptions, "").split(" "));
+    }
+  }
+  return array;
+};
 
+Index.prototype.getUniqueIndex = function(array) {
+  var uniqueIndex = [];
+  for (var item of array) {
+    if (uniqueIndex.indexOf(item) == -1 && item.length > 2) {
+      uniqueIndex.push(item);
+    }
+  }
+  return uniqueIndex;
+};
 
- // Write a function that would iterate over the bookList and extract each book instance
- // For each book instance, split the words into an array making sure that they are unique
- // this list of unique words forms an index kindaf
- // for each word, map it to its occurence in the book object
- ///How would the search work?
+Index.prototype.readFile = function(filePath, callback) {
+  var request = new XMLHttpRequest();
+  request.overrideMimeType("application/json");
+  request.open("GET", filePath, false);
+  request.onreadystatechange = function() {
+    if (request.readyState == 4 && request.status == "200") {
+      callback(request.responseText);
+    }
+  };
+  request.send(null);
+};
+
+Index.prototype.getData = function(filePath) {
+  var data;
+  this.readFile(filePath, function(response) {
+     data = response;
+  });
+  return data;
+};
+
+var index = new Index();
+var a = index.getData("books.json");
+console.log(a);
