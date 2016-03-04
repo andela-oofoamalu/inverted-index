@@ -3,13 +3,14 @@
 function Index() {
   this.dataList = [];
   this.indexObject = {};
+  this.exceptions = /[^a-z\s]/g;
 };
 
 Index.prototype.createIndex = function(filePath) {
   this.dataList = this.getData(filePath);
   var count = 0;
-  for (var data of dataList) {
-    this.indexObject[count] = this.getUniqueIndex(this.parseObject(data));
+  for (var data of this.dataList) {
+    this.indexObject[count] = this.parseObject(data);
     count++;
   }
 };
@@ -20,28 +21,38 @@ Index.prototype.getIndex = function(filePath) {
 };
 
 Index.prototype.search = function(arg) {
-
+  var result = [];
+  if (typeof arg === "string") {
+    arg = arg.split(" ");
+    console.log(arg);
+  }
+  if (Array.isArray(arg)) {
+    arg = arg.toString().toLowerCase().replace(this.exceptions, " ").split(" ");
+    console.log(arg);
+    var searchIndex = new Set(arg);
+    for (var item of searchIndex.values()) {
+      for (var key in this.indexObject) {
+        if (this.indexObject[key].includes(item)) {
+          result.push(key);
+        }
+      }
+    }
+  } else {
+    result = null;
+  }
+  return result;
 };
 
 Index.prototype.parseObject = function(obj) {
-  var array = [];
-  var exceptions = /[^a-z\s]/g;
+  var wordArray = [];
   for (var key in obj) {
     if (obj.hasOwnProperty(key)) {
-      array = array.concat(obj[key].toLowerCase().replace(exceptions, "").split(" "));
+      var dataValue = obj[key];
+      wordArray = wordArray.concat(dataValue.toLowerCase().replace(this.exceptions, "").split(" "));
     }
   }
-  return array;
-};
-
-Index.prototype.getUniqueIndex = function(array) {
-  var uniqueIndex = [];
-  for (var item of array) {
-    if (uniqueIndex.indexOf(item) == -1 && item.length > 2) {
-      uniqueIndex.push(item);
-    }
-  }
-  return uniqueIndex;
+  var uniqueWords = new Set(wordArray);
+  return Array.from(uniqueWords);
 };
 
 Index.prototype.readFile = function(filePath, callback) {
@@ -59,11 +70,7 @@ Index.prototype.readFile = function(filePath, callback) {
 Index.prototype.getData = function(filePath) {
   var data;
   this.readFile(filePath, function(response) {
-     data = response;
+     data = JSON.parse(response);
   });
   return data;
 };
-
-var index = new Index();
-var a = index.getData("books.json");
-console.log(a);
