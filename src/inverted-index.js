@@ -1,4 +1,6 @@
  'use strict';
+// To ensure that the indexobject is not overriten when a new file is read,
+// it should append the new values into the indexobject
 
 function Index() {
   this.dataList = [];
@@ -22,25 +24,29 @@ Index.prototype.getIndex = function(filePath) {
 
 Index.prototype.search = function(arg) {
   var result = [];
-  if (typeof arg === "string") {
-    arg = arg.split(" ");
-    console.log(arg);
-  }
-  if (Array.isArray(arg)) {
-    arg = arg.toString().toLowerCase().replace(this.exceptions, " ").split(" ");
-    console.log(arg);
-    var searchIndex = new Set(arg);
-    for (var item of searchIndex.values()) {
-      for (var key in this.indexObject) {
-        if (this.indexObject[key].includes(item)) {
-          result.push(key);
-        }
-      }
-    }
-  } else {
+  if (typeof arg != 'string' && !Array.isArray(arg)) {
     result = null;
+  } else {
+    if (typeof arg === "string") {
+      arg = arg.split(" ");
+    }
+    arg = arg.toString().toLowerCase().replace(this.exceptions, " ").split(" ");
+    result = this.getSearchResult(arg, this.indexObject);
   }
   return result;
+};
+
+Index.prototype.getSearchResult = function(searchParams, indexObject) {
+  var searchResult = [];
+  var searchIndex = new Set(searchParams);
+  for (var item of searchIndex.values()) {
+    for (var key in indexObject) {
+      if (indexObject[key].includes(item)) {
+        searchResult.push(parseInt(key));
+      }
+    }
+  }
+  return searchResult;
 };
 
 Index.prototype.parseObject = function(obj) {
@@ -74,3 +80,7 @@ Index.prototype.getData = function(filePath) {
   });
   return data;
 };
+
+var index = new Index();
+index.createIndex("books.json");
+console.log(index.search());
