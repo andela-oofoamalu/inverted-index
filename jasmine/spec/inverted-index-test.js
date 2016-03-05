@@ -30,7 +30,7 @@ describe("Inverted index test", function() {
     it("Should call getIndex methond with a filePath", function() {
       spyOn(index, "getIndex");
       expect(index.getIndex).toBeDefined();
-      
+
       var result = index.getIndex("books.json");
       expect(index.getIndex).toHaveBeenCalledWith("books.json");
     });
@@ -91,6 +91,19 @@ describe("Inverted index test", function() {
       expect(result6.length).toEqual(0);
       expect(result6).toEqual(jasmine.arrayContaining([]));
 		});
+
+    it("Should take an array of search parameters and return an array of the indices of the parameters", function() {
+      expect(index.getSearchResult).toBeDefined();
+
+      var obj = {
+        '0': "Hello world!",
+        '1': "This is javascript" 
+      };
+      var result = index.getSearchResult(["Hello", "javascript"], obj);
+
+      expect(result.length).toEqual(2);
+      expect(result).toEqual(jasmine.arrayContaining([0, 1]));
+    })
 	});
 
 });
