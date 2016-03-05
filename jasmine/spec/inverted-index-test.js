@@ -9,11 +9,12 @@ describe("Inverted index test", function() {
 
 	describe("Read book data", function() {
 		it("Should read a JSON file and assert not empty", function() {
-			var books = index.getData("books.json");
+      expect(Index).toBeDefined();
+      expect(index.getData).toBeDefined();
 
-			expect(Index).toBeDefined();
-			expect(index.getData).toBeDefined();
+			var books = index.getData("books.json");
 			expect(books).not.toBe(null);
+      expect(books.length).not.toEqual(0);
 			expect(books).toEqual(jasmine.any(Array));
 
       for (var obj of books) {
@@ -26,14 +27,22 @@ describe("Inverted index test", function() {
 	});
 
 	describe("Populate index", function() {
-		it("Should create an index once a JSON file is read", function() {
-			var indexObject = index.indexObject;
-			expect(index.indexObject).toBeDefined();
-			expect(Object.keys(indexObject).length).toEqual(0);
+    it("Should call getIndex methond with a filePath", function() {
+      spyOn(index, "getIndex");
+      expect(index.getIndex).toBeDefined();
+      
+      var result = index.getIndex("books.json");
+      expect(index.getIndex).toHaveBeenCalledWith("books.json");
+    });
 
+		it("Should create an index once a JSON file is read", function() {
+      spyOn(index, "getIndex");
+			expect(index.indexObject).toBeDefined();
+
+      var indexObject = {};
+			expect(Object.keys(indexObject).length).toEqual(0);
 			index.createIndex("books.json");
-      expect(index.createIndex).toBeDefined();
-			expect(Object.keys(indexObject).length).not.toEqual(0);
+      expect(Object.keys(index.indexObject).length).not.toEqual(0);
 		});
 
 		it("Should map the string keys to the correct objects in the JSON Array", function() {
@@ -58,7 +67,29 @@ describe("Inverted index test", function() {
 
 	describe("Search index", function() {
 		it("Should return an array of the indices of the correct objects that contain the words in the search query", function() {
+      expect(index.createIndex).toBeDefined();
+      expect(index.search).toBeDefined();
 
+      index.createIndex("books.json");
+      var result1 = index.search();
+      var result2 = index.search("Alice");
+      var result3 = index.search("Alice rings");
+      var result4 = index.search(["Lord", "wonderland", "Rabbit"]);
+      var result5 = index.search(34);
+      var result6 = index.search("Poker");
+
+      expect(result1).toBe(null);
+      expect(result2.length).toEqual(1);
+      expect(result2).toEqual(jasmine.arrayContaining([0]));
+      expect(result2).not.toEqual(jasmine.arrayContaining([1]));
+      expect(result3.length).toEqual(2);
+      expect(result3).toEqual(jasmine.arrayContaining([0, 1]));
+      expect(result4.length).toEqual(3);
+      expect(result4).toEqual(jasmine.arrayContaining([1, 0, 0]));
+      expect(result5).toBe(null);
+      expect(result6).not.toBe(null);
+      expect(result6.length).toEqual(0);
+      expect(result6).toEqual(jasmine.arrayContaining([]));
 		});
 	});
 
