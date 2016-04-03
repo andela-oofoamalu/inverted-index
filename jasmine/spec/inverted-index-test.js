@@ -27,7 +27,7 @@ describe("Inverted index test", function() {
 	});
 
 	describe("Populate index", function() {
-    it("Should call getIndex methond with a filePath", function() {
+    it("Should call getIndex method with a filePath", function() {
       spyOn(index, "getIndex");
       expect(index.getIndex).toBeDefined();
 
@@ -36,17 +36,22 @@ describe("Inverted index test", function() {
     });
 
 		it("Should create an index once a JSON file is read", function() {
-      spyOn(index, "getIndex");
 			expect(index.indexObject).toBeDefined();
 
-      var indexObject = {};
-			expect(Object.keys(indexObject).length).toEqual(0);
+			expect(Object.keys(index.indexObject).length).toEqual(0);
 			index.createIndex("books.json");
       expect(Object.keys(index.indexObject).length).not.toEqual(0);
 		});
 
 		it("Should map the string keys to the correct objects in the JSON Array", function() {
+      index.createIndex("books.json");
+      var listOne = index.indexObject[0];
+      var listTwo = index.indexObject[1];
 
+      expect(listOne[0]).toEqual("alice");
+      expect(listOne.includes("elf")).toEqual(false);
+      expect(listTwo[1]).toEqual("lord");
+      expect(listTwo.includes("alice")).toEqual(false);
 		});
 
 		it("Should return an array of unique substrings in lower case", function() {
