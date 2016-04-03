@@ -73,15 +73,15 @@ describe("Inverted index test", function() {
 	describe("Search index", function() {
 		it("Should return an array of the indices of the correct objects that contain the words in the search query", function() {
       expect(index.createIndex).toBeDefined();
-      expect(index.search).toBeDefined();
+      expect(index.searchIndex).toBeDefined();
 
       index.createIndex("books.json");
-      var result1 = index.search();
-      var result2 = index.search("Alice");
-      var result3 = index.search("Alice rings");
-      var result4 = index.search(["Lord", "wonderland", "Rabbit"]);
-      var result5 = index.search(34);
-      var result6 = index.search("Poker");
+      var result1 = index.searchIndex();
+      var result2 = index.searchIndex("Alice");
+      var result3 = index.searchIndex("Alice rings");
+      var result4 = index.searchIndex(["Lord", "wonderland", "Rabbit"]);
+      var result5 = index.searchIndex(34);
+      var result6 = index.searchIndex("Poker");
 
       expect(result1).toBe(null);
       expect(result2.length).toEqual(1);
